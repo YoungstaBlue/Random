@@ -1,0 +1,24 @@
+# Core runtime (always required). Install with:  pip install -r requirements.txt
+numpy>=1.23
+scipy>=1.9
+scikit-learn>=1.2
+pydantic>=2.4
+pydantic-settings>=2.0
+
+# --- Optional accelerators & integration edges ---
+# Uncomment the groups you want, or install extras:  pip install -e ".[all]"
+#
+# faiss-cpu>=1.7            # LSH ANN index (Block A #3)
+# torch>=2.0               # SIMD/GPU cosine similarity (Block A #4)
+# spacy>=3.5               # lemmatization (Block A #1)
+# nltk>=3.8                # stop-words / tokenization
+# eyecite>=2.5             # citation extraction (Module 3/7)
+# anthropic>=0.39          # Claude legal analysis (Module 3)
+# google-api-python-client>=2.100   # Google Drive sync (Module 1)
+# google-auth>=2.23
+# google-auth-oauthlib>=1.1
+# cryptography>=41         # encrypted offline backups (Module 1)
+# fastapi>=0.110           # REST routing surface (Module 2)
+# uvicorn>=0.27
+# httpx>=0.26              # outbound webhooks (Module 2)
+# pytest>=7.4              # tests

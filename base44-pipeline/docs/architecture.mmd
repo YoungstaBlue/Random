@@ -1,0 +1,68 @@
+%% base44 — Unified Legal Analysis & Vector-Matrix Pipeline
+%% Block A (vector-matrix engine) is nested inside Block B (Module 3).
+flowchart TD
+    IN([Incoming case payload / raw legal documents]):::io
+
+    subgraph B1["Module 1 · Core Data & Storage"]
+        LDB[(Local SQLite DB)]
+        CLOUD[Google Drive sync]
+        BAK[Encrypted offline backup]
+    end
+
+    subgraph B2["Module 2 · Processing, Integration & Routing"]
+        ROUTER{{Payload Router}}
+        HOOK[Webhook notifier]
+        API[FastAPI surface]
+    end
+
+    subgraph B6["Module 6 · Workload Categorization"]
+        CAT[Categorize: evidence / statute / precedent / procedure]
+        PRIO[Priority assignment by deadline]
+    end
+
+    subgraph B3["Module 3 · AI Analysis & Verification"]
+        direction TB
+        subgraph A["Block A · Vector-Matrix & E-Discovery Engine"]
+            direction TB
+            A1[1· Ingestion & Preprocessing<br/>tokenize · stop-words · lemmatize]
+            A2[2· Sparse Vectorization<br/>TF-IDF → scipy.sparse CSR]
+            A3[3· LSH Indexing<br/>FAISS IndexLSH / NumPy fallback]
+            A4[4· Accelerated Cosine Similarity<br/>PyTorch / CuPy / NumPy]
+            A1 --> A2 --> A3 --> A4
+        end
+        CITE[Citation & jurisdiction verification]
+        LLM[Claude factual legal analysis]
+    end
+
+    subgraph B4["Module 4 · Visualization & Rendering"]
+        DTREE[Decision tree]
+        GRAPH[Relational graph]
+        MIND[Mind map]
+    end
+
+    subgraph B5["Module 5 · Formatting & Output"]
+        COURT[Court-rules formatter]
+        DICT[Legal dictionary]
+        VER[Version control / audit log]
+    end
+
+    subgraph B7B8["Modules 7 & 8 · Verification + Fine-Tuning"]
+        VERIFY[Citation pre-check + compliance guardrail]
+        METRIC[Latency/accuracy audit + adaptive optimization]
+    end
+
+    OUT([Structured JSON for Base 44 app]):::io
+
+    IN --> LDB --> ROUTER
+    ROUTER --> CAT --> PRIO --> A1
+    A4 --> CITE --> LLM
+    LLM --> B4
+    B4 --> COURT --> DICT --> VER
+    VER --> VERIFY --> METRIC --> OUT
+    ROUTER -. change events .-> HOOK
+    LDB -. redundancy .-> CLOUD
+    LDB -. integrity .-> BAK
+    METRIC -. adaptive routing tweaks .-> ROUTER
+    API --> ROUTER
+
+    classDef io fill:#1f2937,stroke:#4b5563,color:#f9fafb;

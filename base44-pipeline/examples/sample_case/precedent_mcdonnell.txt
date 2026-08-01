@@ -1,0 +1,12 @@
+PRECEDENT SUMMARY — McDonnell Douglas Corp. v. Green, 411 U.S. 792 (1973)
+
+The Supreme Court established a three-step burden-shifting framework for Title VII
+employment discrimination claims lacking direct evidence. First, the plaintiff
+must establish a prima facie case of discrimination. Second, the burden shifts to
+the employer to articulate a legitimate, nondiscriminatory reason for the adverse
+employment action. Third, the plaintiff may show that the stated reason is a
+pretext for unlawful discrimination.
+
+This framework is frequently applied in retaliation and wrongful termination
+disputes. Courts applying stare decisis treat McDonnell Douglas as controlling
+authority for the order and allocation of proof in disparate-treatment cases.

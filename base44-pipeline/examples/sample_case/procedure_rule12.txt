@@ -1,0 +1,11 @@
+PROCEDURAL RULE — Federal Rule of Civil Procedure 12(b)(6)
+
+A party may move to dismiss a complaint for failure to state a claim upon which
+relief can be granted. In ruling on a Rule 12(b)(6) motion, the court accepts all
+well-pleaded factual allegations as true and draws reasonable inferences in favor
+of the plaintiff. The complaint must contain sufficient factual matter to state a
+claim that is plausible on its face.
+
+The moving party bears the burden of showing that no claim has been stated. A
+certificate of service must accompany the motion, and the deadline for a response
+is governed by the local rules and any scheduling order entered by the court.

@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# base44 runtime data & secrets
+.env
+base44_data/
+*.db
+*.sqlite3
+backups/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/
