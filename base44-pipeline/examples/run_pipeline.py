@@ -13,7 +13,7 @@ from pathlib import Path
 
 from base44.ingestion.loaders import load_documents
 from base44.pipeline import Base44Pipeline
-from base44.schemas import CourtFormatConfig
+from base44.schemas import CaseFinancials, CourtFormatConfig
 
 HERE = Path(__file__).parent
 CORPUS_DIR = HERE / "sample_case"
@@ -47,11 +47,17 @@ def main() -> None:
         attorney_name="Jane Roe",
         attorney_bar="PR-98765",
     )
+    financials = CaseFinancials(
+        damages_claimed=1_500_000.0, litigation_cost=200_000.0,
+        evidence_strength=0.8, witness_credibility=0.6,
+        economic_impact=1.2, prob_win_baseline=0.65,
+    )
     result = pipe.process_case(
         case_id="CASE-001",
         text=case_text,
         query="retaliation for reporting unsafe working conditions",
         court=court,
+        financials=financials,
     )
 
     # 3) Show each stage's output.
@@ -89,7 +95,20 @@ def main() -> None:
     print(f"    v{r.version} by {r.author} @ {r.timestamp.isoformat()} "
           f"hash={r.content_hash[:12]}…")
 
-    print("\n[9] Performance metrics (Module 8):")
+    print("\n[9] Quantitative strategy tier:")
+    q = result.quant
+    print(f"    static expected value : ${q.static_expected_value:,.2f}")
+    print(f"    Monte Carlo p5/p50/p95: ${q.monte_carlo.p5:,.0f} / "
+          f"${q.monte_carlo.p50:,.0f} / ${q.monte_carlo.p95:,.0f}")
+    print(f"    Bayesian win prob     : {q.bayesian_win_probability:.2%}")
+    print(f"    gradient ∇f (ev/wit/ec): {q.gradient_leverage.d_evidence:,.0f} / "
+          f"{q.gradient_leverage.d_witness:,.0f} / {q.gradient_leverage.d_economic:,.0f}")
+    if q.nash_equilibrium:
+        print(f"    Nash equilibrium      : Plaintiff→{q.nash_equilibrium.plaintiff_strategy} | "
+              f"Defendant→{q.nash_equilibrium.defendant_strategy}")
+    print(f"    recommendation        : {q.settlement_recommendation}")
+
+    print("\n[10] Performance metrics (Module 8):")
     for m in result.metrics:
         print(f"    {m.stage:12s} {m.duration_ms:8.3f} ms")
 

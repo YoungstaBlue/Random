@@ -2,6 +2,8 @@
 %% Block A (vector-matrix engine) is nested inside Block B (Module 3).
 flowchart TD
     IN([Incoming case payload / raw legal documents]):::io
+    FW[Adversarial semantic firewall<br/>poison-pill quarantine]:::guard
+    FIN([Case financials]):::io
 
     subgraph B1["Module 1 · Core Data & Storage"]
         LDB[(Local SQLite DB)]
@@ -51,14 +53,23 @@ flowchart TD
         METRIC[Latency/accuracy audit + adaptive optimization]
     end
 
+    subgraph QT["Quantitative Strategy tier"]
+        QEV[Expected value + Bayesian update]
+        QCALC[Calculus ∇f + Monte Carlo]
+        QGAME[Game-theory Nash equilibrium]
+        QANOM[Corpus anomaly detection]
+    end
+
     OUT([Structured JSON for Base 44 app]):::io
 
-    IN --> LDB --> ROUTER
+    IN --> FW --> LDB --> ROUTER
     ROUTER --> CAT --> PRIO --> A1
     A4 --> CITE --> LLM
     LLM --> B4
     B4 --> COURT --> DICT --> VER
     VER --> VERIFY --> METRIC --> OUT
+    FIN --> QT --> OUT
+    A4 -. sparse vectors .-> QANOM
     ROUTER -. change events .-> HOOK
     LDB -. redundancy .-> CLOUD
     LDB -. integrity .-> BAK
@@ -66,3 +77,4 @@ flowchart TD
     API --> ROUTER
 
     classDef io fill:#1f2937,stroke:#4b5563,color:#f9fafb;
+    classDef guard fill:#7f1d1d,stroke:#b91c1c,color:#fef2f2;

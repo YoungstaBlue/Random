@@ -19,9 +19,12 @@ from .analysis.semantic_search import SemanticSearchEngine
 from .config import Settings, get_settings
 from .formatting.court_rules import CourtRulesFormatter
 from .formatting.versioning import VersionControl
+from .ingestion.security import SemanticFirewall
+from .quant.engine import QuantitativeStrategyEngine
 from .routing.router import PayloadRouter
 from .routing.webhooks import WebhookNotifier
 from .schemas import (
+    CaseFinancials,
     CourtFormatConfig,
     PipelineResult,
     RawDocument,
@@ -46,6 +49,9 @@ class Base44Pipeline:
         self.notifier = WebhookNotifier(self.settings)
         self.router = PayloadRouter(notifier=self.notifier)
 
+        # Module 1 (ingestion guard) — adversarial semantic firewall
+        self.firewall = SemanticFirewall(quarantine=True)
+
         # Module 6/7 — workload + verification
         self.categorizer = WorkloadCategorizer()
         self.compliance = ComplianceChecker()
@@ -62,8 +68,13 @@ class Base44Pipeline:
 
     # ------------------------------------------------------------------ #
     def index_corpus(self, docs: Sequence[RawDocument]) -> "Base44Pipeline":
-        """Build the Block A semantic index over a document corpus."""
-        self.search.build(docs)
+        """Build the Block A semantic index over a document corpus.
+
+        Documents pass through the adversarial firewall first; poisoned docs are
+        quarantined before any text reaches the vectorizer or LLM.
+        """
+        safe_docs = self.firewall.scan_documents(list(docs))
+        self.search.build(safe_docs)
         self._corpus_ready = self.search.corpus is not None
         return self
 
@@ -73,6 +84,7 @@ class Base44Pipeline:
         text: str,
         query: Optional[str] = None,
         court: Optional[CourtFormatConfig] = None,
+        financials: Optional[CaseFinancials] = None,
         author: str = "base44",
     ) -> PipelineResult:
         """Run the full pipeline over one case payload and return a PipelineResult."""
@@ -118,6 +130,14 @@ class Base44Pipeline:
                 summary=f"Processed case {case_id}",
             )
 
+        quant = None
+        if financials is not None:
+            with metrics.stage("quant"):
+                quant = QuantitativeStrategyEngine(financials).analyze(
+                    corpus=self.search.corpus if self._corpus_ready else None,
+                )
+            self.router.dispatch("case.quantified", quant)
+
         result = PipelineResult(
             case_id=case_id,
             categorized=categorized,
@@ -127,6 +147,7 @@ class Base44Pipeline:
             formatted_document=formatted,
             compliance=compliance,
             revision=revision,
+            quant=quant,
             metrics=metrics.metrics,
         )
         adjustments = metrics.suggest_adjustments()
@@ -142,4 +163,5 @@ class Base44Pipeline:
         self.router.register("case.categorized", lambda p: log.debug("categorized"))
         self.router.register("case.searched", lambda p: log.debug("searched"))
         self.router.register("case.visualized", lambda p: log.debug("visualized"))
+        self.router.register("case.quantified", lambda p: log.debug("quantified"))
         self.router.register("case.completed", lambda p: log.debug("completed"))

@@ -149,6 +149,57 @@ class RevisionRecord(BaseModel):
 
 
 # --------------------------------------------------------------------------- #
+# Quantitative Strategy tier (litigation analytics)
+# --------------------------------------------------------------------------- #
+class CaseFinancials(BaseModel):
+    damages_claimed: float
+    litigation_cost: float
+    evidence_strength: float = Field(ge=0.0, le=1.0)     # 0..1
+    witness_credibility: float = Field(ge=0.0, le=1.0)   # 0..1
+    economic_impact: float
+    prob_win_baseline: float = Field(ge=0.0, le=1.0)     # 0..1
+
+
+class GradientLeverage(BaseModel):
+    """Partial derivatives of the damages model — the leverage points (∇f)."""
+    d_evidence: float
+    d_witness: float
+    d_economic: float
+
+
+class MonteCarloSummary(BaseModel):
+    mean: float
+    std: float
+    p5: float
+    p50: float
+    p95: float
+    iterations: int
+
+
+class NashEquilibrium(BaseModel):
+    plaintiff_strategy: str
+    defendant_strategy: str
+    plaintiff_payoff: float
+    defendant_payoff: float
+    is_pure: bool = True             # False => no pure NE, use mixed strategy
+
+
+class AnomalyMatch(BaseModel):
+    doc_id: str
+    score: float                     # cosine similarity to the target document
+
+
+class QuantitativeStrategyReport(BaseModel):
+    static_expected_value: float
+    bayesian_win_probability: float
+    gradient_leverage: GradientLeverage
+    monte_carlo: MonteCarloSummary
+    nash_equilibrium: Optional[NashEquilibrium] = None
+    anomalies: List[AnomalyMatch] = Field(default_factory=list)
+    settlement_recommendation: str
+
+
+# --------------------------------------------------------------------------- #
 # Orchestrator result (Module 8 metrics attached)
 # --------------------------------------------------------------------------- #
 class StageMetric(BaseModel):
@@ -166,6 +217,7 @@ class PipelineResult(BaseModel):
     formatted_document: Optional[FormattedDocument] = None
     compliance: Optional[ComplianceReport] = None
     revision: Optional[RevisionRecord] = None
+    quant: Optional[QuantitativeStrategyReport] = None
     metrics: List[StageMetric] = Field(default_factory=list)
 
 

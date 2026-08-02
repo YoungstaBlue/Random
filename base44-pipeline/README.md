@@ -18,6 +18,8 @@ and plug into the broader base44 workload without breaking existing routing logi
 ```mermaid
 flowchart TD
     IN([Incoming case payload / raw legal documents]):::io
+    FW[Adversarial semantic firewall<br/>poison-pill quarantine]:::guard
+    FIN([Case financials]):::io
 
     subgraph B1["Module 1 · Core Data & Storage"]
         LDB[(Local SQLite DB)]
@@ -67,14 +69,23 @@ flowchart TD
         METRIC[Latency/accuracy audit + adaptive optimization]
     end
 
+    subgraph QT["Quantitative Strategy tier"]
+        QEV[Expected value + Bayesian update]
+        QCALC[Calculus ∇f + Monte Carlo]
+        QGAME[Game-theory Nash equilibrium]
+        QANOM[Corpus anomaly detection]
+    end
+
     OUT([Structured JSON for Base 44 app]):::io
 
-    IN --> LDB --> ROUTER
+    IN --> FW --> LDB --> ROUTER
     ROUTER --> CAT --> PRIO --> A1
     A4 --> CITE --> LLM
     LLM --> B4
     B4 --> COURT --> DICT --> VER
     VER --> VERIFY --> METRIC --> OUT
+    FIN --> QT --> OUT
+    A4 -. sparse vectors .-> QANOM
     ROUTER -. change events .-> HOOK
     LDB -. redundancy .-> CLOUD
     LDB -. integrity .-> BAK
@@ -82,6 +93,7 @@ flowchart TD
     API --> ROUTER
 
     classDef io fill:#1f2937,stroke:#4b5563,color:#f9fafb;
+    classDef guard fill:#7f1d1d,stroke:#b91c1c,color:#fef2f2;
 ```
 
 The same diagram source lives in [`docs/architecture.mmd`](docs/architecture.mmd).
@@ -142,9 +154,35 @@ those modules **no-op cleanly** (and log) instead of crashing — the full offli
 | **B6** Workload Categorization | `base44/workload/categorize.py`, `priority.py` | four-bucket parse + deadline priority |
 | **B7** Verification & Error Handling | `base44/workload/verify.py` | citation pre-check + compliance guardrail |
 | **B8** Fine-Tuning & Perf Logging | `base44/workload/metrics.py` | per-stage latency + adaptive suggestions |
+| **Guard** Adversarial Semantic Firewall | `base44/ingestion/security.py` | quarantines prompt-injection / "poison pill" documents at ingestion |
+| **Quant** Quantitative Strategy tier | `base44/quant/` | EV · Bayesian updating · calculus leverage (∇f) · Monte Carlo · game-theory Nash · corpus anomaly detection |
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the data-flow detail and JSON payload contracts,
 and [`MASTER_PROMPT.md`](MASTER_PROMPT.md) for the single merged system prompt to drive an agent.
+
+### Quantitative Strategy tier (`base44/quant/`)
+
+An optional decision-support layer that runs when `CaseFinancials` are supplied to
+`process_case(...)`. It produces a `QuantitativeStrategyReport`:
+
+- **Expected value** — `EV = P(win)·damages − P(loss)·cost`
+- **Bayesian updating** — posterior win probability as new evidence arrives
+- **Calculus leverage (∇f)** — partial derivatives of a non-linear damages model showing which
+  input (evidence / witness / economic) moves the award most
+- **Monte Carlo** — award distribution (p5/p50/p95) under variance; seeded for reproducibility
+- **Game theory** — 2×2 settlement payoff tensor + pure-strategy Nash equilibrium
+- **Anomaly detection** — cosine-similarity near-duplicate flags over the **real sparse Block A
+  corpus** (adapted from the original simulated-embedding version to use actual TF-IDF vectors)
+
+```bash
+base44 process --case CASE-001 --corpus ./examples/sample_case \
+    --text-file ./examples/sample_case/complaint.txt \
+    --damages 1500000 --cost 200000 --evidence 0.8 --witness 0.6 --economic 1.2 --pwin 0.65
+```
+
+Ingestion is fronted by an **adversarial semantic firewall** (`base44/ingestion/security.py`)
+that quarantines documents containing prompt-injection ("poison pill") text before any of it
+reaches the vectorizer or the LLM analyst.
 
 ---
 

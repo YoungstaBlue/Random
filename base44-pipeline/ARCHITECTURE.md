@@ -47,6 +47,18 @@ Block B outer pipeline
     author, content hash) (Module 5).
 11. **Measure + adapt** — `workload/metrics.py` times every stage and suggests config/routing
     adjustments from observed outcomes (Module 8).
+12. **Quantitative strategy (optional)** — when `CaseFinancials` are supplied, `quant/engine.py`
+    computes expected value, Bayesian-updated win probability, calculus leverage points (∇f of a
+    non-linear damages model), a Monte Carlo award distribution, a game-theoretic settlement Nash
+    equilibrium, and cosine-similarity anomalies over the real sparse Block A corpus.
+
+Two cross-cutting guards wrap the flow:
+
+- **Adversarial semantic firewall** (`ingestion/security.py`) runs at ingestion, before step 4,
+  quarantining prompt-injection ("poison pill") documents so hostile text never reaches the
+  vectorizer or the LLM.
+- **Sparse-only invariant** — the corpus stays `scipy.sparse` throughout; the quant anomaly engine
+  reuses the same L2-normalized matrix (a sparse dot product = cosine similarity).
 
 The orchestrator returns a single `PipelineResult` aggregating all of the above.
 
