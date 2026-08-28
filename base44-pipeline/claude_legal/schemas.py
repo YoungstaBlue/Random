@@ -53,8 +53,20 @@ class Citation(BaseModel):
     raw: str
     normalized: Optional[str] = None
     jurisdiction: Optional[str] = None      # federal / state / territory (e.g. Puerto Rico)
-    verified: bool = False
+    verified: bool = False                  # well-formed & jurisdiction-classified
     notes: Optional[str] = None
+
+    # Populated only when the CourtListener citator is enabled and reachable.
+    # ``resolved`` distinguishes a real existence check from the offline
+    # ``verified`` flag above: None = lookup not attempted, True = CourtListener
+    # matched this citation to an opinion cluster, False = lookup ran but found
+    # no match. This is NOT a good-law/negative-treatment determination — see
+    # CourtListener.md caveats in analysis/citator.py.
+    resolved: Optional[bool] = None
+    case_name: Optional[str] = None
+    cluster_id: Optional[int] = None
+    courtlistener_url: Optional[str] = None
+    citation_count: Optional[int] = None    # # of opinions citing this one, if reported
 
 
 class PayloadKind(str, Enum):

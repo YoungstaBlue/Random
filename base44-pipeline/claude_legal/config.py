@@ -38,6 +38,13 @@ class Settings(BaseSettings):
     anthropic_api_key: Optional[str] = None
     anthropic_model: str = "claude-opus-4-8"
 
+    # ---- Module 3/7: Citator (CourtListener citation-lookup) ----
+    # Always makes a real network call, so it is explicit opt-in even though the
+    # endpoint itself does not require a token for reasonable use.
+    courtlistener_enabled: bool = False
+    courtlistener_api_token: Optional[str] = None
+    courtlistener_base_url: str = "https://www.courtlistener.com"
+
     # ---- Block A: Vector-Matrix engine tuning ----
     tfidf_max_features: int = 50_000
     tfidf_ngram_max: int = 2
@@ -67,6 +74,10 @@ class Settings(BaseSettings):
     @property
     def webhooks_enabled(self) -> bool:
         return bool(self.webhook_urls)
+
+    @property
+    def citator_enabled(self) -> bool:
+        return self.courtlistener_enabled
 
 
 @lru_cache(maxsize=1)

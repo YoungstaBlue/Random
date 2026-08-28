@@ -34,7 +34,11 @@ Block B outer pipeline
    - `index/lsh_index.py` → hash rows into LSH buckets for ANN candidate selection
    - `query/similarity.py` → accelerated cosine similarity over just the bucket shortlist
 5. **Verify citations** — `analysis/citations.py` extracts citations and classifies
-   jurisdiction (federal / state / US territory incl. Puerto Rico) (Module 3/7).
+   jurisdiction (federal / state / US territory incl. Puerto Rico) (Module 3/7). When
+   `CLAUDE_LEGAL_COURTLISTENER_ENABLED=true`, `analysis/citator.py` additionally resolves each
+   citation against CourtListener's real citation-lookup API — an existence check (confirms a real
+   on-file opinion), not a good-law/negative-treatment determination. Disabled by default, so this
+   step is offline and a no-op unless explicitly configured.
 6. **Analyze** — `analysis/llm.py` produces strictly factual analysis via Claude (Module 3),
    or a structured "disabled" note when no API key is set.
 7. **Visualize** — `visualization/` emits decision-tree, relational-graph, and mind-map JSON
@@ -75,7 +79,7 @@ Modules never import each other's internals; they exchange the pydantic models i
 | `PriorityTask` | workload.priority | result |
 | `VisualizationBundle` (`TreeNode`, `GraphData`) | visualization | Claude app |
 | `CourtFormatConfig` → `FormattedDocument` | formatting | verify |
-| `Citation` / `ComplianceReport` | analysis.citations, workload.verify | result |
+| `Citation` / `ComplianceReport` | analysis.citations (+ analysis.citator), workload.verify | result |
 | `RevisionRecord` | formatting.versioning | storage, result |
 | `StageMetric` / `PipelineResult` | pipeline + metrics | caller / Claude app |
 

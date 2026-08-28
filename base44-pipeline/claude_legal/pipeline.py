@@ -54,7 +54,7 @@ class ClaudePipeline:
 
         # Module 6/7 — workload + verification
         self.categorizer = WorkloadCategorizer()
-        self.compliance = ComplianceChecker()
+        self.compliance = ComplianceChecker(self.settings)
 
         # Module 3 — semantic search (Block A engine)
         self.search = SemanticSearchEngine(self.settings)

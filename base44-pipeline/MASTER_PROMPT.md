@@ -65,7 +65,10 @@ documents at scale by **legal meaning** using a sparse-vector / LSH / cosine-sim
      query vector and the matching bucket's documents, leveraging SIMD/GPU acceleration
      (PyTorch / CuPy / optimized NumPy).
 - **Citation & Jurisdiction Verification:** Automatically cross-reference and verify all legal
-  citations — federal, state, and US territory jurisprudence (e.g., Puerto Rico).
+  citations — federal, state, and US territory jurisprudence (e.g., Puerto Rico). When enabled,
+  additionally resolve each citation against a real citator (CourtListener) to confirm it names an
+  actual on-file opinion. Always disclose the difference: this confirms *existence*, not *good-law
+  status* — never represent a resolved citation as confirmed-good-law without a paid citator.
 
 ### MODULE 4 — VISUALIZATION & RENDERING PIPELINE
 - **Decision Tree Engine:** Generate node-and-branch data mapping procedural choices, legal

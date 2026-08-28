@@ -9,13 +9,14 @@ from __future__ import annotations
 from typing import List, Optional
 
 from ..analysis.citations import CitationVerifier
+from ..config import Settings
 from ..formatting.legal_dictionary import LegalDictionary
 from ..schemas import ComplianceReport, CourtFormatConfig, FormattedDocument
 
 
 class ComplianceChecker:
-    def __init__(self) -> None:
-        self._citations = CitationVerifier()
+    def __init__(self, settings: Optional[Settings] = None) -> None:
+        self._citations = CitationVerifier(settings)
         self._dictionary = LegalDictionary()
 
     def check(

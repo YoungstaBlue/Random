@@ -5,15 +5,24 @@ territory such as Puerto Rico). Uses the ``eyecite`` library when installed for
 robust extraction; otherwise a regex extractor covers the common reporter
 patterns so verification always runs.
 
-NOTE: "verified" here means *well-formed and jurisdiction-classified*. Wiring a
-paid citator (authoritative good-law check) is left as a configured edge.
+NOTE: "verified" here means *well-formed and jurisdiction-classified* — purely
+offline pattern-matching. When ``CLAUDE_LEGAL_COURTLISTENER_ENABLED=true``,
+``verify_text`` also resolves each citation against the real CourtListener
+citation-lookup API (see ``analysis/citator.py``) and populates the
+``resolved``/``case_name``/``courtlistener_url`` fields on each ``Citation``.
+That confirms a citation names a real, on-file opinion; it is still not an
+authoritative good-law/negative-treatment check — see the caveat in
+``citator.py``. The citator is disabled by default (offline-safe), so this
+module never makes a network call unless explicitly configured to.
 """
 from __future__ import annotations
 
 import re
-from typing import List
+from typing import List, Optional
 
+from ..config import Settings, get_settings
 from ..schemas import Citation
+from .citator import CourtListenerCitator
 
 # e.g. "347 U.S. 483", "410 F.3d 1200", "5 P.R. Offic. Trans. 1"
 _CITE_RE = re.compile(
@@ -34,6 +43,10 @@ _TERRITORY_HINTS = {
 
 
 class CitationVerifier:
+    def __init__(self, settings: Optional[Settings] = None) -> None:
+        self.settings = settings or get_settings()
+        self._citator = CourtListenerCitator(self.settings)
+
     def extract(self, text: str) -> List[Citation]:
         out: List[Citation] = []
         for m in _CITE_RE.finditer(text):
@@ -51,7 +64,14 @@ class CitationVerifier:
         return out
 
     def verify_text(self, text: str) -> List[Citation]:
-        """Prefer eyecite when available, else regex."""
+        """Prefer eyecite when available, else regex; then resolve against
+        CourtListener if the citator is enabled."""
+        citations = self._extract_text(text)
+        if self._citator.enabled:
+            citations = self._citator.resolve(citations)
+        return citations
+
+    def _extract_text(self, text: str) -> List[Citation]:
         try:  # pragma: no cover - optional dependency
             from eyecite import get_citations
 

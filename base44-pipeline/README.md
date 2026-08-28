@@ -148,7 +148,7 @@ those modules **no-op cleanly** (and log) instead of crashing — the full offli
 | **A#4** Accelerated Cosine Similarity | `claude_legal/query/` | PyTorch / CuPy / NumPy dot product on the LSH shortlist |
 | **B1** Core Data & Storage | `claude_legal/storage/` | SQLite, Google Drive sync, Fernet-encrypted backups |
 | **B2** Processing & Routing | `claude_legal/routing/` | payload router, webhooks, FastAPI |
-| **B3** AI Analysis & Verification | `claude_legal/analysis/` | semantic search (Block A), citations, Claude analysis |
+| **B3** AI Analysis & Verification | `claude_legal/analysis/` | semantic search (Block A), citations, CourtListener citator, Claude analysis |
 | **B4** Visualization | `claude_legal/visualization/` | decision tree, relational graph, mind map JSON |
 | **B5** Formatting & Output | `claude_legal/formatting/` | court-rules formatter, legal dictionary, versioning |
 | **B6** Workload Categorization | `claude_legal/workload/categorize.py`, `priority.py` | four-bucket parse + deadline priority |
@@ -184,6 +184,28 @@ Ingestion is fronted by an **adversarial semantic firewall** (`claude_legal/inge
 that quarantines documents containing prompt-injection ("poison pill") text before any of it
 reaches the vectorizer or the LLM analyst.
 
+### Citator (`claude_legal/analysis/citator.py`)
+
+Offline citation extraction only proves a citation is *well-formed*. The citator closes that gap
+with a real lookup against [CourtListener](https://www.courtlistener.com)'s public citation-lookup
+API (Free Law Project) — it confirms a citation resolves to an actual, on-file opinion and
+attaches the case name, cluster id, and CourtListener URL. It's a genuine network integration
+(disabled by default, like the other credentialed edges) rather than a stub:
+
+```bash
+CLAUDE_LEGAL_COURTLISTENER_ENABLED=true claude_legal process --case CASE-001 \
+    --text "See 347 U.S. 483 for the controlling standard." \
+    --plaintiff "A" --defendant "B" --case-number "1:1"
+```
+
+**This is an existence check, not a good-law check.** CourtListener's free API does not do
+automated negative-treatment / overruled detection (that's what paid citators like Westlaw KeyCite
+or Lexis Shepard's provide) — a resolved, heavily-cited case can still have been overruled. See the
+caveat block at the top of `citator.py` for the full disclosure, including that its response-field
+mapping was written from CourtListener's documented API shape but could not be live-tested from the
+sandboxed environment this was built in (outbound access to `courtlistener.com` is blocked by that
+environment's network policy) — smoke-test it against the live API before depending on it.
+
 ---
 
 ## Design guarantees
@@ -197,6 +219,8 @@ reaches the vectorizer or the LLM analyst.
   editing existing code.
 - **Honest edges.** Cloud/LLM/webhook integrations are real library-backed code, gated by config.
 
-> ⚠️ This is engineering scaffolding, not legal advice. "Verified" citations here means
-> *well-formed and jurisdiction-classified*; wire an authoritative citator before relying on
-> good-law status, and have a licensed attorney review any generated filing.
+> ⚠️ This is engineering scaffolding, not legal advice. "Verified" citations means *well-formed and
+> jurisdiction-classified*; the optional CourtListener citator additionally confirms a citation
+> resolves to a real opinion, but that is still not an authoritative good-law/negative-treatment
+> check — wire a paid citator (KeyCite/Shepard's) before relying on good-law status, and have a
+> licensed attorney review any generated filing.
