@@ -1,7 +1,7 @@
 import pytest
 
-from base44.ingestion.security import SecurityException, SemanticFirewall
-from base44.schemas import RawDocument
+from claude_legal.ingestion.security import SecurityException, SemanticFirewall
+from claude_legal.schemas import RawDocument
 
 
 def test_firewall_flags_poison_pill():

@@ -1,4 +1,4 @@
-# base44 — Architecture & Data-Flow Reference
+# Claude Legal — Architecture & Data-Flow Reference
 
 This document explains how the two source specs fuse into one pipeline, the exact data flow,
 and the JSON payload contracts that keep every module decoupled.
@@ -17,13 +17,13 @@ Block B outer pipeline
 
 ## End-to-end data flow
 
-`Base44Pipeline.process_case()` (in `base44/pipeline.py`) is the single orchestrator:
+`ClaudePipeline.process_case()` (in `claude_legal/pipeline.py`) is the single orchestrator:
 
 1. **Ingest / store** — raw documents load via `ingestion/loaders.py`; `storage/local_db.py`
    persists case files, facts, witness statements, notes (Module 1). `storage/cloud_sync.py`
    and `storage/backup.py` provide off-site redundancy and encrypted offline integrity.
 2. **Route** — `routing/router.py` dispatches structured payloads by named route and fires
-   `routing/webhooks.py` on every change so the Base 44 app's visual layers stay live (Module 2).
+   `routing/webhooks.py` on every change so the Claude app's visual layers stay live (Module 2).
 3. **Categorize + prioritize** — `workload/categorize.py` parses the payload into evidence /
    statutory authority / precedent / procedural rules; `workload/priority.py` ranks tasks by
    procedural-deadline proximity (Module 6).
@@ -38,7 +38,7 @@ Block B outer pipeline
 6. **Analyze** — `analysis/llm.py` produces strictly factual analysis via Claude (Module 3),
    or a structured "disabled" note when no API key is set.
 7. **Visualize** — `visualization/` emits decision-tree, relational-graph, and mind-map JSON
-   for the Base 44 renderers (Module 4).
+   for the Claude app's renderers (Module 4).
 8. **Format** — `formatting/court_rules.py` builds a compliant caption, signature block, and
    certificate of service; `formatting/legal_dictionary.py` defines Latin terms (Module 5).
 9. **Verify compliance** — `workload/verify.py` runs the citation pre-check and flags missing
@@ -65,7 +65,7 @@ The orchestrator returns a single `PipelineResult` aggregating all of the above.
 ## JSON payload contracts
 
 Modules never import each other's internals; they exchange the pydantic models in
-`base44/schemas.py`. Key contracts:
+`claude_legal/schemas.py`. Key contracts:
 
 | Model | Produced by | Consumed by |
 |-------|-------------|-------------|
@@ -73,11 +73,11 @@ Modules never import each other's internals; they exchange the pydantic models i
 | `QueryResult` / `SearchHit` | analysis (Block A) | analysis (LLM), routing, result |
 | `CategorizedPayload` | workload.categorize | priority, visualization |
 | `PriorityTask` | workload.priority | result |
-| `VisualizationBundle` (`TreeNode`, `GraphData`) | visualization | Base 44 app |
+| `VisualizationBundle` (`TreeNode`, `GraphData`) | visualization | Claude app |
 | `CourtFormatConfig` → `FormattedDocument` | formatting | verify |
 | `Citation` / `ComplianceReport` | analysis.citations, workload.verify | result |
 | `RevisionRecord` | formatting.versioning | storage, result |
-| `StageMetric` / `PipelineResult` | pipeline + metrics | caller / Base 44 app |
+| `StageMetric` / `PipelineResult` | pipeline + metrics | caller / Claude app |
 
 Runtime artifacts that don't belong in a JSON contract — the sparse TF-IDF matrix and the
 LSH index handle — are deliberately kept out of the schemas and passed by reference within the

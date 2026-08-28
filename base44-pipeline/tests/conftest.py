@@ -1,6 +1,6 @@
 import pytest
 
-from base44.schemas import RawDocument
+from claude_legal.schemas import RawDocument
 
 
 @pytest.fixture

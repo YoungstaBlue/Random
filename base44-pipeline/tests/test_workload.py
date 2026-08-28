@@ -1,7 +1,7 @@
 from datetime import date, timedelta
 
-from base44.workload.categorize import WorkloadCategorizer
-from base44.workload.priority import assign_priorities
+from claude_legal.workload.categorize import WorkloadCategorizer
+from claude_legal.workload.priority import assign_priorities
 
 
 def test_categorize_into_four_buckets():
@@ -18,7 +18,7 @@ def test_categorize_into_four_buckets():
 
 
 def test_priority_prefers_near_deadlines():
-    from base44.schemas import CategorizedPayload
+    from claude_legal.schemas import CategorizedPayload
 
     cat = CategorizedPayload(procedural_rules=["file response", "schedule hearing"])
     today = date(2025, 1, 1)

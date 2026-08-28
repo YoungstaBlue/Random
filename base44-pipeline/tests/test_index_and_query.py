@@ -1,7 +1,7 @@
-from base44.index.lsh_index import LSHIndex
-from base44.ingestion.preprocess import Preprocessor
-from base44.query.similarity import CosineRanker
-from base44.vectorize.sparse_vectorizer import SparseVectorizer
+from claude_legal.index.lsh_index import LSHIndex
+from claude_legal.ingestion.preprocess import Preprocessor
+from claude_legal.query.similarity import CosineRanker
+from claude_legal.vectorize.sparse_vectorizer import SparseVectorizer
 
 
 def _corpus_matrix(corpus):

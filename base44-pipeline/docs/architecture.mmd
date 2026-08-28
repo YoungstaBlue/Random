@@ -1,4 +1,4 @@
-%% base44 — Unified Legal Analysis & Vector-Matrix Pipeline
+%% Claude Legal — Unified Legal Analysis & Vector-Matrix Pipeline
 %% Block A (vector-matrix engine) is nested inside Block B (Module 3).
 flowchart TD
     IN([Incoming case payload / raw legal documents]):::io
@@ -60,7 +60,7 @@ flowchart TD
         QANOM[Corpus anomaly detection]
     end
 
-    OUT([Structured JSON for Base 44 app]):::io
+    OUT([Structured JSON for the Claude app]):::io
 
     IN --> FW --> LDB --> ROUTER
     ROUTER --> CAT --> PRIO --> A1

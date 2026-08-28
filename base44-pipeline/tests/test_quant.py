@@ -1,8 +1,8 @@
 import math
 
-from base44.quant.engine import QuantitativeStrategyEngine
-from base44.quant.expected_value import ExpectedValueEngine
-from base44.schemas import CaseFinancials
+from claude_legal.quant.engine import QuantitativeStrategyEngine
+from claude_legal.quant.expected_value import ExpectedValueEngine
+from claude_legal.schemas import CaseFinancials
 
 
 def _fin(**kw):

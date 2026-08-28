@@ -1,4 +1,4 @@
-"""End-to-end demo of the base44 pipeline — runs fully offline (no credentials).
+"""End-to-end demo of the Claude Legal pipeline — runs fully offline (no credentials).
 
     python examples/run_pipeline.py
 
@@ -11,9 +11,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from base44.ingestion.loaders import load_documents
-from base44.pipeline import Base44Pipeline
-from base44.schemas import CaseFinancials, CourtFormatConfig
+from claude_legal.ingestion.loaders import load_documents
+from claude_legal.pipeline import ClaudePipeline
+from claude_legal.schemas import CaseFinancials, CourtFormatConfig
 
 HERE = Path(__file__).parent
 CORPUS_DIR = HERE / "sample_case"
@@ -21,10 +21,10 @@ CORPUS_DIR = HERE / "sample_case"
 
 def main() -> None:
     print("=" * 72)
-    print("base44 — Unified Legal Analysis & Vector-Matrix Pipeline (demo)")
+    print("claude_legal — Unified Legal Analysis & Vector-Matrix Pipeline (demo)")
     print("=" * 72)
 
-    pipe = Base44Pipeline()
+    pipe = ClaudePipeline()
 
     # 1) Block A: ingest + sparse-vectorize + LSH-index the corpus.
     docs = load_documents(CORPUS_DIR)

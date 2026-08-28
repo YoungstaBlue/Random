@@ -1,5 +1,5 @@
-from base44.ingestion.preprocess import Preprocessor, _naive_lemma
-from base44.schemas import RawDocument
+from claude_legal.ingestion.preprocess import Preprocessor, _naive_lemma
+from claude_legal.schemas import RawDocument
 
 
 def test_stopwords_and_lemmatization():

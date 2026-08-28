@@ -1,15 +1,15 @@
-# base44 — Unified Legal Analysis & Vector-Matrix Pipeline
+# Claude Legal — Unified Legal Analysis & Vector-Matrix Pipeline
 
-One pipeline that merges two specs into a single system:
+One pipeline that merges two specs into a single system, orchestrated by Claude:
 
 - **Block A — High-Performance Vector Matrix & E-Discovery Module**: ingest → sparse
   TF-IDF vectorization → FAISS LSH indexing → hardware-accelerated cosine similarity.
-- **Block B — Base 44 Superagent**: an 8-module legal-analysis architecture (storage,
+- **Block B — Claude Legal Superagent**: an 8-module legal-analysis architecture (storage,
   routing, AI analysis, visualization, formatting, workload, verification, fine-tuning).
 
 **Block A is not a separate system — it is the semantic-search core of Block B's Module 3.**
-Everything routes through one orchestrator (`base44/pipeline.py`) so components stay modular
-and plug into the broader base44 workload without breaking existing routing logic.
+Everything routes through one orchestrator (`claude_legal/pipeline.py`) so components stay modular
+and plug into the broader Claude Legal workload without breaking existing routing logic.
 
 ---
 
@@ -76,7 +76,7 @@ flowchart TD
         QANOM[Corpus anomaly detection]
     end
 
-    OUT([Structured JSON for Base 44 app]):::io
+    OUT([Structured JSON for the Claude app]):::io
 
     IN --> FW --> LDB --> ROUTER
     ROUTER --> CAT --> PRIO --> A1
@@ -103,14 +103,14 @@ The same diagram source lives in [`docs/architecture.mmd`](docs/architecture.mmd
 ## Quickstart
 
 ```bash
-cd base44-pipeline
+cd claude-legal-pipeline
 pip install -e .            # core deps only (numpy, scipy, scikit-learn, pydantic)
 
 # Run the full pipeline offline on the bundled sample case:
 python examples/run_pipeline.py
 
 # Or via the CLI:
-base44 process --case CASE-001 --corpus ./examples/sample_case \
+claude_legal process --case CASE-001 --corpus ./examples/sample_case \
     --text-file ./examples/sample_case/complaint.txt \
     --query "retaliation for reporting unsafe working conditions" \
     --plaintiff "Maria Santos" --defendant "Acme Logistics Inc." \
@@ -142,25 +142,25 @@ those modules **no-op cleanly** (and log) instead of crashing — the full offli
 
 | Spec | Package location | What it does |
 |------|------------------|--------------|
-| **A#1** Ingestion & Preprocessing | `base44/ingestion/` | tokenize, stop-word removal, lemmatization |
-| **A#2** Sparse Vectorization | `base44/vectorize/` | TF-IDF → **`scipy.sparse` CSR** (no dense path) |
-| **A#3** LSH Indexing | `base44/index/` | FAISS `IndexLSH` (+ NumPy random-hyperplane fallback) |
-| **A#4** Accelerated Cosine Similarity | `base44/query/` | PyTorch / CuPy / NumPy dot product on the LSH shortlist |
-| **B1** Core Data & Storage | `base44/storage/` | SQLite, Google Drive sync, Fernet-encrypted backups |
-| **B2** Processing & Routing | `base44/routing/` | payload router, webhooks, FastAPI |
-| **B3** AI Analysis & Verification | `base44/analysis/` | semantic search (Block A), citations, Claude analysis |
-| **B4** Visualization | `base44/visualization/` | decision tree, relational graph, mind map JSON |
-| **B5** Formatting & Output | `base44/formatting/` | court-rules formatter, legal dictionary, versioning |
-| **B6** Workload Categorization | `base44/workload/categorize.py`, `priority.py` | four-bucket parse + deadline priority |
-| **B7** Verification & Error Handling | `base44/workload/verify.py` | citation pre-check + compliance guardrail |
-| **B8** Fine-Tuning & Perf Logging | `base44/workload/metrics.py` | per-stage latency + adaptive suggestions |
-| **Guard** Adversarial Semantic Firewall | `base44/ingestion/security.py` | quarantines prompt-injection / "poison pill" documents at ingestion |
-| **Quant** Quantitative Strategy tier | `base44/quant/` | EV · Bayesian updating · calculus leverage (∇f) · Monte Carlo · game-theory Nash · corpus anomaly detection |
+| **A#1** Ingestion & Preprocessing | `claude_legal/ingestion/` | tokenize, stop-word removal, lemmatization |
+| **A#2** Sparse Vectorization | `claude_legal/vectorize/` | TF-IDF → **`scipy.sparse` CSR** (no dense path) |
+| **A#3** LSH Indexing | `claude_legal/index/` | FAISS `IndexLSH` (+ NumPy random-hyperplane fallback) |
+| **A#4** Accelerated Cosine Similarity | `claude_legal/query/` | PyTorch / CuPy / NumPy dot product on the LSH shortlist |
+| **B1** Core Data & Storage | `claude_legal/storage/` | SQLite, Google Drive sync, Fernet-encrypted backups |
+| **B2** Processing & Routing | `claude_legal/routing/` | payload router, webhooks, FastAPI |
+| **B3** AI Analysis & Verification | `claude_legal/analysis/` | semantic search (Block A), citations, Claude analysis |
+| **B4** Visualization | `claude_legal/visualization/` | decision tree, relational graph, mind map JSON |
+| **B5** Formatting & Output | `claude_legal/formatting/` | court-rules formatter, legal dictionary, versioning |
+| **B6** Workload Categorization | `claude_legal/workload/categorize.py`, `priority.py` | four-bucket parse + deadline priority |
+| **B7** Verification & Error Handling | `claude_legal/workload/verify.py` | citation pre-check + compliance guardrail |
+| **B8** Fine-Tuning & Perf Logging | `claude_legal/workload/metrics.py` | per-stage latency + adaptive suggestions |
+| **Guard** Adversarial Semantic Firewall | `claude_legal/ingestion/security.py` | quarantines prompt-injection / "poison pill" documents at ingestion |
+| **Quant** Quantitative Strategy tier | `claude_legal/quant/` | EV · Bayesian updating · calculus leverage (∇f) · Monte Carlo · game-theory Nash · corpus anomaly detection |
 
 See [`ARCHITECTURE.md`](ARCHITECTURE.md) for the data-flow detail and JSON payload contracts,
 and [`MASTER_PROMPT.md`](MASTER_PROMPT.md) for the single merged system prompt to drive an agent.
 
-### Quantitative Strategy tier (`base44/quant/`)
+### Quantitative Strategy tier (`claude_legal/quant/`)
 
 An optional decision-support layer that runs when `CaseFinancials` are supplied to
 `process_case(...)`. It produces a `QuantitativeStrategyReport`:
@@ -175,12 +175,12 @@ An optional decision-support layer that runs when `CaseFinancials` are supplied 
   corpus** (adapted from the original simulated-embedding version to use actual TF-IDF vectors)
 
 ```bash
-base44 process --case CASE-001 --corpus ./examples/sample_case \
+claude_legal process --case CASE-001 --corpus ./examples/sample_case \
     --text-file ./examples/sample_case/complaint.txt \
     --damages 1500000 --cost 200000 --evidence 0.8 --witness 0.6 --economic 1.2 --pwin 0.65
 ```
 
-Ingestion is fronted by an **adversarial semantic firewall** (`base44/ingestion/security.py`)
+Ingestion is fronted by an **adversarial semantic firewall** (`claude_legal/ingestion/security.py`)
 that quarantines documents containing prompt-injection ("poison pill") text before any of it
 reaches the vectorizer or the LLM analyst.
 
@@ -192,7 +192,7 @@ reaches the vectorizer or the LLM analyst.
   is never called on it (only tiny per-query shortlists are densified).
 - **ANN, not O(N²).** Queries are compared only against LSH-bucket candidates; the result
   reports `candidates_scanned` vs `total_docs` so pruning is observable.
-- **Strict modularity.** Modules talk only through the pydantic contracts in `base44/schemas.py`;
+- **Strict modularity.** Modules talk only through the pydantic contracts in `claude_legal/schemas.py`;
   `pipeline.py` is the sole wiring point. New services register on the `PayloadRouter` without
   editing existing code.
 - **Honest edges.** Cloud/LLM/webhook integrations are real library-backed code, gated by config.

@@ -1,8 +1,8 @@
-from base44.analysis.citations import CitationVerifier
-from base44.formatting.court_rules import CourtRulesFormatter
-from base44.formatting.legal_dictionary import LegalDictionary
-from base44.schemas import CourtFormatConfig
-from base44.workload.verify import ComplianceChecker
+from claude_legal.analysis.citations import CitationVerifier
+from claude_legal.formatting.court_rules import CourtRulesFormatter
+from claude_legal.formatting.legal_dictionary import LegalDictionary
+from claude_legal.schemas import CourtFormatConfig
+from claude_legal.workload.verify import ComplianceChecker
 
 
 def test_court_formatter_includes_required_sections():

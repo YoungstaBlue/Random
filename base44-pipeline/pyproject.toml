@@ -3,13 +3,13 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "base44-pipeline"
+name = "claude-legal-pipeline"
 version = "0.1.0"
-description = "base44 — Unified Legal Analysis & Vector-Matrix Pipeline (sparse TF-IDF + FAISS LSH + hardware-accelerated cosine similarity, wrapped by an 8-module legal-analysis architecture)."
+description = "Claude Legal — Unified Legal Analysis & Vector-Matrix Pipeline (sparse TF-IDF + FAISS LSH + hardware-accelerated cosine similarity, wrapped by an 8-module legal-analysis architecture)."
 readme = "README.md"
 requires-python = ">=3.9"
 license = { text = "MIT" }
-authors = [{ name = "base44" }]
+authors = [{ name = "Claude" }]
 
 # --- Core dependencies: always required, lightweight, pure-Python/NumPy stack ---
 dependencies = [
@@ -51,14 +51,14 @@ api = [
 ]
 dev = ["pytest>=7.4"]
 all = [
-    "base44-pipeline[accel,nlp,legal,llm,cloud,api,dev]",
+    "claude-legal-pipeline[accel,nlp,legal,llm,cloud,api,dev]",
 ]
 
 [project.scripts]
-base44 = "base44.cli:main"
+claude_legal = "claude_legal.cli:main"
 
 [tool.setuptools.packages.find]
-include = ["base44*"]
+include = ["claude_legal*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

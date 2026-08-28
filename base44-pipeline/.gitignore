@@ -10,9 +10,9 @@ dist/
 venv/
 env/
 
-# base44 runtime data & secrets
+# claude_legal runtime data & secrets
 .env
-base44_data/
+claude_legal_data/
 *.db
 *.sqlite3
 backups/

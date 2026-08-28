@@ -1,8 +1,8 @@
 import numpy as np
 import scipy.sparse as sp
 
-from base44.ingestion.preprocess import Preprocessor
-from base44.vectorize.sparse_vectorizer import SparseVectorizer
+from claude_legal.ingestion.preprocess import Preprocessor
+from claude_legal.vectorize.sparse_vectorizer import SparseVectorizer
 
 
 def _clean(corpus):
