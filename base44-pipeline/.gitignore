@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+build/
+dist/
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# claude_legal runtime data & secrets
+.env
+claude_legal_data/
+*.db
+*.sqlite3
+backups/
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

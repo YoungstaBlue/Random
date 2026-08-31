@@ -1,0 +1,64 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "claude-legal-pipeline"
+version = "0.1.0"
+description = "Claude Legal — Unified Legal Analysis & Vector-Matrix Pipeline (sparse TF-IDF + FAISS LSH + hardware-accelerated cosine similarity, wrapped by an 8-module legal-analysis architecture)."
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [{ name = "Claude" }]
+
+# --- Core dependencies: always required, lightweight, pure-Python/NumPy stack ---
+dependencies = [
+    "numpy>=1.23",
+    "scipy>=1.9",          # scipy.sparse — mandatory sparse matrices (Block A #2)
+    "scikit-learn>=1.2",   # TfidfVectorizer -> sparse CSR
+    "pydantic>=2.4",       # typed JSON payload contracts between modules
+    "pydantic-settings>=2.0",
+]
+
+[project.optional-dependencies]
+# Heavyweight accelerators. Used automatically when installed; the package
+# falls back to a pure-NumPy path when they are absent (see index/ and query/).
+accel = [
+    "faiss-cpu>=1.7",      # LSH ANN index (Block A #3). Use faiss-gpu for CUDA.
+    "torch>=2.0",          # SIMD/GPU cosine similarity (Block A #4)
+]
+nlp = [
+    "spacy>=3.5",          # lemmatization (Block A #1)
+    "nltk>=3.8",           # stop-words / tokenization fallback
+]
+# External-integration edges (Block B). Real code; require your credentials.
+legal = [
+    "eyecite>=2.5",        # citation extraction/normalization (Module 3/7)
+]
+llm = [
+    "anthropic>=0.39",     # factual legal analysis via Claude (Module 3)
+]
+cloud = [
+    "google-api-python-client>=2.100",
+    "google-auth>=2.23",
+    "google-auth-oauthlib>=1.1",
+    "cryptography>=41",    # Fernet encryption for offline backups (Module 1)
+]
+api = [
+    "fastapi>=0.110",
+    "uvicorn>=0.27",
+    "httpx>=0.26",         # outbound webhooks (Module 2)
+]
+dev = ["pytest>=7.4"]
+all = [
+    "claude-legal-pipeline[accel,nlp,legal,llm,cloud,api,dev]",
+]
+
+[project.scripts]
+claude_legal = "claude_legal.cli:main"
+
+[tool.setuptools.packages.find]
+include = ["claude_legal*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
